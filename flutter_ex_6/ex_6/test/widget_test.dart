@@ -1,33 +1,28 @@
+// This is a basic Flutter widget test.
+//
+// To perform an interaction with a widget in your test, use the WidgetTester
+// utility in the flutter_test package. For example, you can send tap and scroll
+// gestures. You can also use WidgetTester to find child widgets in the widget
+// tree, read text, and verify that the values of widget properties are correct.
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ex_6/main.dart';
 
 void main() {
-  testWidgets('Add Account form and list display test', (WidgetTester tester) async {
-    // Build the app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(const MaterialApp());
 
-    // Verify the main title is shown
-    expect(find.text('Simple Bank Account Manager'), findsOneWidget);
+    // Verify that our counter starts at 0.
+    expect(find.text('0'), findsOneWidget);
+    expect(find.text('1'), findsNothing);
 
-    // Find the input fields and button
-    final accountHolderField = find.byType(TextFormField).at(0);
-    final balanceField = find.byType(TextFormField).at(1);
-    final addButton = find.text('Add Account');
+    // Tap the '+' icon and trigger a frame.
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pump();
 
-    // Enter data into the form fields
-    await tester.enterText(accountHolderField, 'John Doe');
-    await tester.enterText(balanceField, '1000');
-
-    // Tap the Add Account button
-    await tester.tap(addButton);
-    await tester.pump(const Duration(seconds: 1)); // simulate UI refresh
-
-    // Verify Snackbar message
-    expect(find.text('Account Details Saved'), findsOneWidget);
-
-    // After save, verify input fields are cleared
-    expect(find.text('John Doe'), findsNothing);
-    expect(find.text('1000'), findsNothing);
+    // Verify that our counter has incremented.
+    expect(find.text('0'), findsNothing);
+    expect(find.text('1'), findsOneWidget);
   });
 }

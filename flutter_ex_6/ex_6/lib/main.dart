@@ -1,179 +1,139 @@
 import 'package:flutter/material.dart';
-import 'package:ex_6/databasehelper.dart';
-import 'bank.dart';
-
+import 'product.dart';
+import 'data_helper.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  runApp(MaterialApp(
+    title: "Simple Bank Account Manager",
+    home: BankApp(),
+  ));
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+class BankApp extends StatefulWidget {
+  const BankApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<BankApp> createState() => _BankAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _BankAppState extends State<BankApp> {
   final _formKey = GlobalKey<FormState>();
-  final _accountHolderController = TextEditingController();
+  final _nameController = TextEditingController();
   final _balanceController = TextEditingController();
-  List<BankAccount> _accounts = [];
+  List<Account> _accounts = [];
+  double _total = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _showAllAccounts();
+    _refresh();
   }
 
-  Future<void> _showAllAccounts() async {
+  Future<void> _refresh() async {
     final accounts = await DatabaseHelper.instance.readAllAccounts();
+    final total = await DatabaseHelper.instance.totalBalance();
     setState(() {
       _accounts = accounts;
+      _total = total;
     });
-  }
-
-  double getTotalBankBalance() {
-    return _accounts.fold(
-      0,
-      (sum, account) => sum + account.balance,
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Simple Bank Account Manager",
-      home: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 243, 242, 225),
-        appBar: AppBar(
-          title: const Text("Simple Bank Account Manager"),
-          backgroundColor: const Color.fromARGB(255, 255, 175, 2),
-        ),
-        body: Container(
-          padding: const EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                // Account Holder Name
-                TextFormField(
-                  controller: _accountHolderController,
-                  keyboardType: TextInputType.text,
-                  decoration: const InputDecoration(
-                    labelText: "Enter Account Holder Name",
-                    border: OutlineInputBorder(),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Bank Accounts'),
+        backgroundColor: Colors.blueAccent,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('Total money in bank: \$${_total.toStringAsFixed(2)}',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 12),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Account holder name',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Enter account holder name';
+                      }
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter the account holder name";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-
-                // Initial Balance
-                TextFormField(
-                  controller: _balanceController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: "Enter Initial Balance",
-                    border: OutlineInputBorder(),
+                  SizedBox(height: 12),
+                  TextFormField(
+                    controller: _balanceController,
+                    keyboardType: TextInputType.numberWithOptions(decimal: true),
+                    decoration: InputDecoration(
+                      labelText: 'Initial balance',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Enter initial balance';
+                      }
+                      final parsed = double.tryParse(value);
+                      if (parsed == null) return 'Enter a valid number';
+                      return null;
+                    },
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return "Please enter the initial balance";
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-
-                // Add Account Button
-                Builder(
-                  builder: (context) {
-                    return ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 255, 132, 31),
-                        foregroundColor: Colors.black,
-                      ),
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          String accountHolder = _accountHolderController.text;
-                          double balance =
-                              double.parse(_balanceController.text);
-
-                          BankAccount account = BankAccount(
-                            accountHolder: accountHolder,
-                            balance: balance,
-                          );
-
-                          await DatabaseHelper.instance.insertAccount(account);
-                          await _showAllAccounts();
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Account Details Saved")),
-                          );
-
-                          _accountHolderController.clear();
-                          _balanceController.clear();
-                        }
-                      },
-                      child: const Text("Add Account"),
-                    );
-                  },
-                ),
-
-                const SizedBox(height: 10),
-
-                // Display all accounts
-                Expanded(
-                  child: _accounts.isEmpty
-                      ? const Center(child: Text("No accounts found"))
-                      : ListView.builder(
-                          itemCount: _accounts.length,
-                          itemBuilder: (context, index) {
-                            final account = _accounts[index];
-                            return ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: account.balance == 0
-                                    ? Colors.red
-                                    : Colors.blue,
-                                child:
-                                    Text(account.accountHolder[0].toUpperCase()),
-                              ),
-                              title: Text(account.accountHolder),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Balance: ₹${account.balance}"),
-                                  if (account.balance == 0)
-                                    const Text(
-                                      "Low Balance!",
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                ),
-
-                // Total Bank Balance
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Total Money in Bank: ₹${getTotalBankBalance()}",
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                ),
-              ],
+                  SizedBox(height: 12),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueGrey,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        final name = _nameController.text.trim();
+                        final balance = double.parse(_balanceController.text.trim());
+                        final account = Account(accountHolder: name, balance: balance);
+                        final messenger = ScaffoldMessenger.of(context);
+                        await DatabaseHelper.instance.insertAccount(account);
+                        messenger.showSnackBar(SnackBar(content: Text('Account saved')));
+                        _nameController.clear();
+                        _balanceController.clear();
+                        await _refresh();
+                      }
+                    },
+                    child: Text('Save Account'),
+                  )
+                ],
+              ),
             ),
-          ),
+            SizedBox(height: 12),
+            Expanded(
+              child: _accounts.isEmpty
+                  ? Center(child: Text('No accounts yet'))
+                  : ListView.builder(
+                      itemCount: _accounts.length,
+                      itemBuilder: (context, index) {
+                        final acc = _accounts[index];
+                        return Card(
+                          margin: EdgeInsets.symmetric(vertical: 6),
+                          child: ListTile(
+                            leading: CircleAvatar(child: Text(acc.accountHolder.isNotEmpty ? acc.accountHolder[0].toUpperCase() : '?')),
+                            title: Text(acc.accountHolder),
+                            subtitle: Text('Balance: \$${acc.balance.toStringAsFixed(2)}'),
+                            trailing: acc.balance == 0
+                                ? Text('Low Balance!', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold))
+                                : null,
+                          ),
+                        );
+                      },
+                    ),
+            )
+          ],
         ),
       ),
     );
