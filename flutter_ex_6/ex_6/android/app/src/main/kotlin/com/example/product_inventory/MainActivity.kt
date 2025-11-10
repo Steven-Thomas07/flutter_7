@@ -1,4 +1,4 @@
-package com.example.ex_6
+package com.example.product_inventory
 
 import io.flutter.embedding.android.FlutterActivity
 

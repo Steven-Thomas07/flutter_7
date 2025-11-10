@@ -1,6 +1,6 @@
 {
-    "name": "ex_6",
-    "short_name": "ex_6",
+    "name": "product_inventory",
+    "short_name": "product_inventory",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

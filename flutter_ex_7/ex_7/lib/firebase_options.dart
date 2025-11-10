@@ -4,6 +4,16 @@ import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
+/// Default [FirebaseOptions] for use with your Firebase apps.
+///
+/// Example:
+/// ```dart
+/// import 'firebase_options.dart';
+/// // ...
+/// await Firebase.initializeApp(
+///   options: DefaultFirebaseOptions.currentPlatform,
+/// );
+/// ```
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
@@ -41,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyC10Fk0eAF4KJBBR5KhsTclZ0uDlU7GSlM',
-    appId: '1:427298903807:android:238430c6d68fcddd035eca',
+    appId: '1:427298903807:android:ee495240abfcc70f035eca',
     messagingSenderId: '427298903807',
     projectId: 'bookmanagement-23139',
     storageBucket: 'bookmanagement-23139.firebasestorage.app',
@@ -49,29 +59,28 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAx8IsWbsWZb2siRSAOwlZXcHkT9yIoLhc',
-    appId: '1:427298903807:ios:e27f2db01b6caa35035eca',
+    appId: '1:427298903807:ios:87d150eabff8bc9f035eca',
     messagingSenderId: '427298903807',
     projectId: 'bookmanagement-23139',
     storageBucket: 'bookmanagement-23139.firebasestorage.app',
-    iosBundleId: 'com.example.ex10',
+    iosBundleId: 'com.example.ex7',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyAx8IsWbsWZb2siRSAOwlZXcHkT9yIoLhc',
-    appId: '1:427298903807:ios:e27f2db01b6caa35035eca',
+    appId: '1:427298903807:ios:87d150eabff8bc9f035eca',
     messagingSenderId: '427298903807',
     projectId: 'bookmanagement-23139',
     storageBucket: 'bookmanagement-23139.firebasestorage.app',
-    iosBundleId: 'com.example.ex10',
+    iosBundleId: 'com.example.ex7',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
     apiKey: 'AIzaSyBhQpACpzE5ExxRSQXliV6jtTEi5CNnauY',
-    appId: '1:427298903807:web:aa1fe79fab73683a035eca',
+    appId: '1:427298903807:web:f3ed041c6446813d035eca',
     messagingSenderId: '427298903807',
     projectId: 'bookmanagement-23139',
     authDomain: 'bookmanagement-23139.firebaseapp.com',
     storageBucket: 'bookmanagement-23139.firebasestorage.app',
   );
-
 }
